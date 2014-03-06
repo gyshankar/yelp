@@ -1,0 +1,139 @@
+<html>
+<head>
+<style type="text/css">
+body
+{
+	line-height: 1.6em;
+}
+
+#gridtable
+{
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 12px;
+	margin: 45px;
+	width: 480px;
+	text-align: left;
+	border-collapse: collapse;
+}
+#gridtable th
+{
+	font-size: 14px;
+	font-weight: normal;
+	padding: 12px 15px;
+	border-right: 1px solid #fff;
+	border-left: 1px solid #fff;
+	color: #039;
+}
+#gridtable td
+{
+	padding: 8px 15px;
+	border-right: 1px solid #fff;
+	border-left: 1px solid #fff;
+	color: #669;
+}
+.gridtable-odd
+{
+	background: #eff2ff;
+}
+.gridtable-even
+{
+	background: #e8edff;
+}
+#gridtable #gridtable-adventure, #gridtable #gridtable-children
+{
+	background: #d0dafd;
+	border-bottom: 1px solid #c8d4fd;
+}
+#gridtable #gridtable-comedy, #gridtable #gridtable-action
+{
+	background: #dce4ff;
+	border-bottom: 1px solid #d6dfff;
+}
+
+  </style>
+<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDY0kkJiTPVd2U7aTOAwhc9ySH6oHxOIYM&sensor=false">
+</script>
+
+<script>
+function initialize()
+{
+var mapProp = {
+  center:new google.maps.LatLng(51.508742,-0.120850),
+  zoom:5,
+  mapTypeId:google.maps.MapTypeId.ROADMAP
+  };
+var map=new google.maps.Map(document.getElementById("googleMap")
+  ,mapProp);
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+
+<script src="jquery.js"></script>
+<script>
+
+$(function() {
+     $(".button").click(function() {
+    	var name = $("input#name").val();  
+      $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        url: '/mymap/mymaps/' + name,
+        success: function(griddata)
+        {
+      	  var globalgrid = griddata.businesses;
+          // remove all data - but the headers!
+          $("#gridtable").find("tr:gt(0)").remove();
+          if( globalgrid.length === 0)
+          {
+               $('#errormsg').html('Sorry, <strong>no</strong> rows returned!');
+               return;
+          }
+
+          for( var i=0; i < globalgrid.length; i++ )
+          {
+             var line = globalgrid[i];
+             // insert after last row!
+             $('#gridtable > tbody:last').append('<tr data-code='+ line.location +'><td>'+line.name+'</td></tr>');
+          }
+        },
+        error: function(data, errorText)
+        {
+          $("#errormsg").html(errorText).show();
+        }
+      });      
+      return false;
+    });
+    return false;
+});
+
+</script>
+</head>
+<body>
+
+	<h1>My Maps</h1>
+	
+<div id="contact_form">
+  <form name="contact" action="">
+    <fieldset>
+      <label for="name" id="name_label">Search</label>
+      <input type="text" name="name" id="name" size="30" value="" class="text-input" />
+      <button name="submit" class="button" id="submit_btn" value="Send" />
+    </fieldset>
+  </form>
+  </div>
+<table id="gridtable" summary="Most Favorite Movies">
+    <colgroup>
+    	<col class="gridtable-odd" />
+    </colgroup>
+    <thead>
+    	<tr>
+        	<th scope="col" id="gridtable-comedy">Result</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<div id="googleMap" style="width:500px;height:380px;"></div>
+</body>
+</html>
